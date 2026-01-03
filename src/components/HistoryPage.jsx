@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const API_URL = 'http://56.228.33.77:3000/api';
+// const API_URL = 'http://localhost:3000/api';
 
 const HistoryPage = () => {
   const [games, setGames] = useState([]);
@@ -19,20 +20,37 @@ const HistoryPage = () => {
       setError('');
 
       const res = await axios.get(`${API_URL}/games`);
+      console.log('API Response:', res.data); 
+
       
-      // Backend returns array directly, not nested in data
+      if (!res.data) {
+        throw new Error('No data received from server');
+      }
+
       const gamesData = Array.isArray(res.data) ? res.data : [];
-      
-      // Ensure rounds always exist and use correct property name
+
+      gamesData.forEach((game, index) => {
+        console.log(`Game ${index}:`, {
+          id: game.id,
+          hasRounds: !!game.Rounds,
+          roundsType: typeof game.Rounds,
+          roundsValue: game.Rounds
+        });
+      });
+
+   
       const formattedGames = gamesData.map(g => ({
         ...g,
-        id: g.id, 
-        rounds: g.Rounds || [], 
+        id: g.id || g._id, 
+        rounds: Array.isArray(g.Rounds) ? g.Rounds :
+          Array.isArray(g.rounds) ? g.rounds : [],
         player1Score: g.player1Score || 0,
         player2Score: g.player2Score || 0,
-        tieRounds: g.tieRounds || 0
+        tieRounds: g.tieRounds || 0,
+        createdAt: g.createdAt || g.created_at || new Date().toISOString()
       }));
 
+      console.log('Formatted Games:', formattedGames); 
       setGames(formattedGames);
     } catch (err) {
       console.error('Fetch games error:', err);
@@ -116,7 +134,7 @@ const HistoryPage = () => {
         {!loading && error && (
           <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-4">
             {error}
-            <button 
+            <button
               onClick={fetchGames}
               className="ml-4 text-red-700 font-semibold"
             >
