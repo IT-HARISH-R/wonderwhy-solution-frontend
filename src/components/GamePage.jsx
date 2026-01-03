@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const API_URL = 'http://56.228.33.77:3000/api';
-
+// const API_URL = 'http://localhost:3000/api';
 const GamePage = () => {
   const [step, setStep] = useState(1);
   const [player1Name, setPlayer1Name] = useState('');
@@ -34,7 +34,8 @@ const GamePage = () => {
         player2Name
       });
 
-      setGameId(response.data.gameId);
+      // Backend returns the game object directly
+      setGameId(response.data.id); // Use id, not gameId
       setStep(2);
       setCurrentRound(1);
       setRounds([]);
@@ -60,7 +61,7 @@ const GamePage = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/games/play-round`, {
+      const response = await axios.post(`${API_URL}/games/playround`, {
         gameId,
         roundNumber: currentRound,
         player1Choice: choices.player1,
@@ -124,7 +125,7 @@ const GamePage = () => {
             </button>
           </div>
         </div>
-        
+
         {/* Step 1: Player Setup */}
         {step === 1 && (
           <div className="bg-white rounded-lg shadow p-6">
