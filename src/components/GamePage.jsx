@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api'; 
+const API_URL = 'http://localhost:3000/api';
 
 const GamePage = () => {
   const [step, setStep] = useState(1); // 1: Setup, 2: Game, 3: Results
@@ -33,7 +33,7 @@ const GamePage = () => {
         player1Name,
         player2Name
       });
-      
+
       setGameId(response.data.gameId);
       setStep(2);
       setCurrentRound(1);
@@ -68,17 +68,17 @@ const GamePage = () => {
       });
 
       const { round, scores: newScores, gameWinner: winner } = response.data;
-      
+
       setRounds(prev => [...prev, round]);
       setScores(newScores);
-      
+
       if (currentRound === 6) {
         setGameWinner(winner);
         setStep(3);
       } else {
         setCurrentRound(prev => prev + 1);
       }
-      
+
       setChoices({ player1: null, player2: null });
     } catch (error) {
       console.error('Error playing round:', error);
@@ -116,15 +116,22 @@ const GamePage = () => {
             Stone Paper Scissors
           </h1>
           <p className="text-gray-600">Battle it out in 6 rounds!</p>
+          <div className='flex justify-end'>
+            <button
+              onClick={() => window.location.href = '/history'} 
+              className=" bg-blue-600  text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full sm:w-auto"
+            >
+              History
+            </button>
+          </div>
         </div>
-
         {/* Step 1: Player Setup */}
         {step === 1 && (
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
               Enter Player Names
             </h2>
-            
+
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-gray-700 mb-2">Player 1 Name</label>
@@ -136,7 +143,7 @@ const GamePage = () => {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-gray-700 mb-2">Player 2 Name</label>
                 <input
@@ -177,14 +184,14 @@ const GamePage = () => {
                   {scores.player1}
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-lg shadow p-4 text-center">
                 <h3 className="text-gray-700 mb-2">Ties</h3>
                 <div className="text-3xl font-bold text-gray-600">
                   {scores.ties}
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-lg shadow p-4 text-center">
                 <h3 className="text-gray-700 mb-2">{player2Name}</h3>
                 <div className="text-3xl font-bold text-red-600">
@@ -206,11 +213,10 @@ const GamePage = () => {
                       <button
                         key={choice.id}
                         onClick={() => handleChoice('player1', choice.id)}
-                        className={`p-4 rounded-lg border-2 ${
-                          choices.player1 === choice.id 
-                            ? 'border-blue-500 bg-blue-50' 
-                            : 'border-gray-300 hover:bg-gray-50'
-                        }`}
+                        className={`p-4 rounded-lg border-2 ${choices.player1 === choice.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-300 hover:bg-gray-50'
+                          }`}
                       >
                         <div className="text-2xl mb-2">{choice.emoji}</div>
                         <div className="text-sm font-medium">{choice.label}</div>
@@ -229,11 +235,10 @@ const GamePage = () => {
                       <button
                         key={choice.id}
                         onClick={() => handleChoice('player2', choice.id)}
-                        className={`p-4 rounded-lg border-2 ${
-                          choices.player2 === choice.id 
-                            ? 'border-red-500 bg-red-50' 
-                            : 'border-gray-300 hover:bg-gray-50'
-                        }`}
+                        className={`p-4 rounded-lg border-2 ${choices.player2 === choice.id
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-300 hover:bg-gray-50'
+                          }`}
                       >
                         <div className="text-2xl mb-2">{choice.emoji}</div>
                         <div className="text-sm font-medium">{choice.label}</div>
@@ -278,8 +283,8 @@ const GamePage = () => {
                           <td className="py-3 capitalize">{round.player1Choice}</td>
                           <td className="py-3 capitalize">{round.player2Choice}</td>
                           <td className="py-3">
-                            {round.winner === 'player1' ? player1Name : 
-                             round.winner === 'player2' ? player2Name : 'Tie'}
+                            {round.winner === 'player1' ? player1Name :
+                              round.winner === 'player2' ? player2Name : 'Tie'}
                           </td>
                         </tr>
                       ))}
@@ -309,14 +314,14 @@ const GamePage = () => {
                   {scores.player1}
                 </div>
               </div>
-              
+
               <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
                 <h3 className="text-gray-700 mb-2">Ties</h3>
                 <div className="text-4xl font-bold text-gray-600">
                   {scores.ties}
                 </div>
               </div>
-              
+
               <div className="bg-red-50 rounded-lg p-4 text-center border border-red-200">
                 <h3 className="text-gray-700 mb-2">{player2Name}</h3>
                 <div className="text-4xl font-bold text-red-600">
@@ -347,8 +352,8 @@ const GamePage = () => {
                         <td className="py-3 capitalize">{round.player1Choice}</td>
                         <td className="py-3 capitalize">{round.player2Choice}</td>
                         <td className="py-3">
-                          {round.winner === 'player1' ? player1Name : 
-                           round.winner === 'player2' ? player2Name : 'Tie'}
+                          {round.winner === 'player1' ? player1Name :
+                            round.winner === 'player2' ? player2Name : 'Tie'}
                         </td>
                       </tr>
                     ))}
@@ -365,7 +370,7 @@ const GamePage = () => {
               >
                 Play Again
               </button>
-              
+
               <button
                 onClick={() => window.location.href = '/history'}
                 className="flex-1 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700"
