@@ -26,8 +26,8 @@ const HistoryPage = () => {
       // Ensure rounds always exist and use correct property name
       const formattedGames = gamesData.map(g => ({
         ...g,
-        id: g.id, // Use id (not _id)
-        rounds: g.Rounds || [], // Backend returns 'Rounds' with capital R
+        id: g.id, 
+        rounds: g.Rounds || [], 
         player1Score: g.player1Score || 0,
         player2Score: g.player2Score || 0,
         tieRounds: g.tieRounds || 0

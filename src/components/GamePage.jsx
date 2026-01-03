@@ -34,8 +34,7 @@ const GamePage = () => {
         player2Name
       });
 
-      // Backend returns the game object directly
-      setGameId(response.data.id); // Use id, not gameId
+      setGameId(response.data.id); 
       setStep(2);
       setCurrentRound(1);
       setRounds([]);
