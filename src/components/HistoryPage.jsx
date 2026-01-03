@@ -19,10 +19,10 @@ const HistoryPage = () => {
       setLoading(true);
       setError('');
 
-      const res = await axios.get(`${API_URL}/games`);
-      console.log('API Response:', res.data); 
+      const res = await axios.get('http://56.228.33.77:3000/api/games');
+      console.log('API Response:', res.data);
 
-      
+
       if (!res.data) {
         throw new Error('No data received from server');
       }
@@ -38,10 +38,10 @@ const HistoryPage = () => {
         });
       });
 
-   
+
       const formattedGames = gamesData.map(g => ({
         ...g,
-        id: g.id || g._id, 
+        id: g.id || g._id,
         rounds: Array.isArray(g.Rounds) ? g.Rounds :
           Array.isArray(g.rounds) ? g.rounds : [],
         player1Score: g.player1Score || 0,
@@ -50,7 +50,7 @@ const HistoryPage = () => {
         createdAt: g.createdAt || g.created_at || new Date().toISOString()
       }));
 
-      console.log('Formatted Games:', formattedGames); 
+      console.log('Formatted Games:', formattedGames);
       setGames(formattedGames);
     } catch (err) {
       console.error('Fetch games error:', err);
