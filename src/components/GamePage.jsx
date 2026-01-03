@@ -4,7 +4,7 @@ import axios from 'axios';
 const API_URL = 'http://56.228.33.77:3000/api';
 
 const GamePage = () => {
-  const [step, setStep] = useState(1); // 1: Setup, 2: Game, 3: Results
+  const [step, setStep] = useState(1);
   const [player1Name, setPlayer1Name] = useState('');
   const [player2Name, setPlayer2Name] = useState('');
   const [gameId, setGameId] = useState(null);
@@ -112,19 +112,19 @@ const GamePage = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Stone Paper Scissors
-          </h1>
+          <h1 className="text-3xl font-bold mb-2">Stone Paper Scissors</h1>
           <p className="text-gray-600">Battle it out in 6 rounds!</p>
-          <div className='flex justify-end'>
+
+          <div className="flex justify-end mt-3">
             <button
-             onClick={() => window.location.href = '/history'}
-              className=" bg-blue-600  text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full sm:w-auto"
+              onClick={() => (window.location.href = "/history")}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             >
-              Refresh
+              History
             </button>
           </div>
         </div>
+        
         {/* Step 1: Player Setup */}
         {step === 1 && (
           <div className="bg-white rounded-lg shadow p-6">
