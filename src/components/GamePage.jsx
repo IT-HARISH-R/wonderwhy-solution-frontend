@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'http://56.228.33.77:3000/api';
 
 const GamePage = () => {
   const [step, setStep] = useState(1); // 1: Setup, 2: Game, 3: Results
@@ -118,10 +118,10 @@ const GamePage = () => {
           <p className="text-gray-600">Battle it out in 6 rounds!</p>
           <div className='flex justify-end'>
             <button
-              onClick={() => window.location.href = '/history'} 
+             onClick={() => window.location.href = '/history'}
               className=" bg-blue-600  text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full sm:w-auto"
             >
-              History
+              Refresh
             </button>
           </div>
         </div>

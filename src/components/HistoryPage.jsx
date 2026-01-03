@@ -1,28 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api';
 
 const HistoryPage = () => {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedGameId, setSelectedGameId] = useState(null);
 
   useEffect(() => {
     fetchGames();
   }, []);
 
-  const fetchGames = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(`${API_URL}/games`);
-      setGames(res.data);
-      setError('');
-    } catch {
-      setError('Failed to fetch games');
-    } finally {
-      setLoading(false);
-    }
+const fetchGames = async () => {
+  try {
+    setLoading(true);
+    const res = await axios.get(`http://56.228.33.77:3000/api/games`);
+
+    // 👇 SAFELY extract array
+    const gamesData =
+      Array.isArray(res.data)
+        ? res.data
+        : res.data.data || [];
+
+    setGames(gamesData);
+    setError('');
+  } catch (err) {
+    setError('Failed to fetch games');
+    setGames([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  const toggleGame = (id) => {
+    setSelectedGameId(prev => (prev === id ? null : id));
   };
 
   const formatDate = (date) =>
@@ -88,10 +101,14 @@ const HistoryPage = () => {
           </div>
         )}
 
-        {/* MOBILE CARDS */}
+        {/* ================= MOBILE VIEW ================= */}
         <div className="space-y-4 md:hidden">
-          {games.map(g => (
-            <div key={g._id} className="bg-white p-4 rounded-xl shadow">
+          { games.map(g => (
+            <div
+              key={g._id}
+              onClick={() => toggleGame(g._id)}
+              className="bg-white p-4 rounded-xl shadow cursor-pointer"
+            >
               <div className="flex justify-between mb-2">
                 <span className="text-sm text-gray-500">
                   {formatDate(g.createdAt)}
@@ -101,18 +118,41 @@ const HistoryPage = () => {
                 </span>
               </div>
 
-              <p className="font-semibold">{g.player1Name} vs {g.player2Name}</p>
-              <p className="text-gray-600 text-sm mt-1">
+              <p className="font-semibold">
+                {g.player1Name} vs {g.player2Name}
+              </p>
+              <p className="text-gray-600 text-sm">
                 Score: {g.player1Score} - {g.player2Score}
               </p>
-              <p className="text-gray-500 text-xs mt-1">
-                Rounds: {g.rounds.length}/6
-              </p>
+
+              {/* ROUNDS */}
+              {selectedGameId === g._id && (
+                <div className="mt-4 border-t pt-3 space-y-2 text-sm">
+                  {g.rounds.map(r => (
+                    <div
+                      key={r._id}
+                      className="flex justify-between bg-gray-50 p-2 rounded"
+                    >
+                      <span>R{r.roundNumber}</span>
+                      <span className="capitalize">
+                        {r.player1Choice} vs {r.player2Choice}
+                      </span>
+                      <span className="font-semibold">
+                        {r.winner === 'player1'
+                          ? g.player1Name
+                          : r.winner === 'player2'
+                          ? g.player2Name
+                          : 'Tie'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
 
-        {/* DESKTOP TABLE */}
+        {/* ================= DESKTOP VIEW ================= */}
         {!loading && games.length > 0 && (
           <div className="hidden md:block bg-white rounded-xl shadow overflow-x-auto">
             <table className="w-full text-sm">
@@ -126,20 +166,62 @@ const HistoryPage = () => {
                   <th className="p-4">Rounds</th>
                 </tr>
               </thead>
+
               <tbody className="divide-y">
                 {games.map(g => (
-                  <tr key={g._id} className="hover:bg-gray-50">
-                    <td className="p-4">{formatDate(g.createdAt)}</td>
-                    <td className="p-4">{g.player1Name}</td>
-                    <td className="p-4">{g.player2Name}</td>
-                    <td className="p-4">{g.player1Score} - {g.player2Score}</td>
-                    <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full ${badgeColor(g.gameWinner)}`}>
-                        {getWinner(g)}
-                      </span>
-                    </td>
-                    <td className="p-4">{g.rounds.length}/6</td>
-                  </tr>
+                  <React.Fragment key={g._id}>
+                    <tr
+                      onClick={() => toggleGame(g._id)}
+                      className="hover:bg-gray-50 cursor-pointer"
+                    >
+                      <td className="p-4">{formatDate(g.createdAt)}</td>
+                      <td className="p-4">{g.player1Name}</td>
+                      <td className="p-4">{g.player2Name}</td>
+                      <td className="p-4">
+                        {g.player1Score} - {g.player2Score}
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-3 py-1 rounded-full ${badgeColor(g.gameWinner)}`}>
+                          {getWinner(g)}
+                        </span>
+                      </td>
+                      <td className="p-4">{g.rounds.length}/6</td>
+                    </tr>
+
+                    {/* EXPANDED ROUNDS */}
+                    {selectedGameId === g._id && (
+                      <tr className="bg-gray-50">
+                        <td colSpan="6" className="p-4">
+                          <table className="w-full text-sm border rounded-lg overflow-hidden">
+                            <thead className="bg-gray-200">
+                              <tr>
+                                <th className="p-2">Round</th>
+                                <th className="p-2">{g.player1Name}</th>
+                                <th className="p-2">{g.player2Name}</th>
+                                <th className="p-2">Winner</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {g.rounds.map(r => (
+                                <tr key={r._id} className="text-center border-t">
+                                  <td className="p-2">{r.roundNumber}</td>
+                                  <td className="p-2 capitalize">{r.player1Choice}</td>
+                                  <td className="p-2 capitalize">{r.player2Choice}</td>
+                                  <td className="p-2 font-semibold">
+                                    {r.winner === 'player1'
+                                      ? g.player1Name
+                                      : r.winner === 'player2'
+                                      ? g.player2Name
+                                      : 'Tie'}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
@@ -152,6 +234,7 @@ const HistoryPage = () => {
             ← Back to Game
           </a>
         </div>
+
       </div>
     </div>
   );
