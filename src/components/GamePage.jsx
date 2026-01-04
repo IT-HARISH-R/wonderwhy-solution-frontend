@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const API_URL = 'http://56.228.33.77:3000/api';
 // const API_URL = 'http://localhost:3000/api';
+
 const GamePage = () => {
   const [step, setStep] = useState(1);
   const [player1Name, setPlayer1Name] = useState('');
@@ -33,8 +34,8 @@ const GamePage = () => {
         player1Name,
         player2Name
       });
-
-      setGameId(response.data.id); 
+      console.log(response)
+      setGameId(response.data.id);
       setStep(2);
       setCurrentRound(1);
       setRounds([]);
@@ -52,6 +53,7 @@ const GamePage = () => {
     setChoices(prev => ({ ...prev, [player]: choice }));
   };
 
+  // PLAY ROUND
   const playRound = async () => {
     if (!choices.player1 || !choices.player2) {
       alert('Both players must make a choice');
@@ -67,19 +69,19 @@ const GamePage = () => {
         player2Choice: choices.player2
       });
 
+      console.log("API Response:", response.data);
+
       const { round, scores: newScores, gameWinner: winner } = response.data;
 
       setRounds(prev => [...prev, round]);
-      setScores(newScores);
+      setScores(newScores ?? { player1: 0, player2: 0, ties: 0 });
+      setGameWinner(winner ?? null);
 
-      if (currentRound === 6) {
-        setGameWinner(winner);
-        setStep(3);
-      } else {
-        setCurrentRound(prev => prev + 1);
-      }
+      if (currentRound === 6) setStep(3);
+      else setCurrentRound(prev => prev + 1);
 
       setChoices({ player1: null, player2: null });
+
     } catch (error) {
       console.error('Error playing round:', error);
       alert('Failed to play round. Please try again.');
@@ -87,6 +89,8 @@ const GamePage = () => {
       setLoading(false);
     }
   };
+
+
 
   const resetGame = () => {
     setStep(1);
@@ -181,21 +185,21 @@ const GamePage = () => {
               <div className="bg-white rounded-lg shadow p-4 text-center">
                 <h3 className="text-gray-700 mb-2">{player1Name}</h3>
                 <div className="text-3xl font-bold text-blue-600">
-                  {scores.player1}
+                  {scores?.player1 ?? 0}
                 </div>
               </div>
 
               <div className="bg-white rounded-lg shadow p-4 text-center">
                 <h3 className="text-gray-700 mb-2">Ties</h3>
                 <div className="text-3xl font-bold text-gray-600">
-                  {scores.ties}
+                  {scores?.ties ?? 0}
                 </div>
               </div>
 
               <div className="bg-white rounded-lg shadow p-4 text-center">
                 <h3 className="text-gray-700 mb-2">{player2Name}</h3>
                 <div className="text-3xl font-bold text-red-600">
-                  {scores.player2}
+                  {scores?.player2 ?? 0}
                 </div>
               </div>
             </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const API_URL = 'http://56.228.33.77:3000/api';
-// const API_URL = 'http://localhost:3000/api';
+// const API_URL = 'http://localhost:3000/api'; 
 
 const HistoryPage = () => {
   const [games, setGames] = useState([]);
@@ -19,36 +19,45 @@ const HistoryPage = () => {
       setLoading(true);
       setError('');
 
-      const res = await axios.get('http://56.228.33.77:3000/api/games');
+      const res = await axios.get(`${API_URL}/games`);
       console.log('API Response:', res.data);
 
-
-      if (!res.data) {
-        throw new Error('No data received from server');
-      }
+      if (!res.data) throw new Error('No data received from server');
 
       const gamesData = Array.isArray(res.data) ? res.data : [];
 
-      gamesData.forEach((game, index) => {
-        console.log(`Game ${index}:`, {
-          id: game.id,
-          hasRounds: !!game.Rounds,
-          roundsType: typeof game.Rounds,
-          roundsValue: game.Rounds
+      // Format games with dynamic scores and tie rounds
+      const formattedGames = gamesData.map(game => {
+        const rounds = Array.isArray(game.rounds) ? game.rounds : [];
+
+        let player1Score = 0;
+        let player2Score = 0;
+        let tieRounds = 0;
+
+        rounds.forEach(r => {
+          if (r.winner === 'player1') player1Score++;
+          else if (r.winner === 'player2') player2Score++;
+          else tieRounds++;
         });
+
+        // Determine game winner dynamically
+        let gameWinner = null;
+        if (rounds.length === 6) {
+          if (player1Score > player2Score) gameWinner = 'player1';
+          else if (player2Score > player1Score) gameWinner = 'player2';
+          else gameWinner = 'tie';
+        }
+
+        return {
+          ...game,
+          rounds,
+          player1Score,
+          player2Score,
+          tieRounds,
+          gameWinner,
+          createdAt: game.createdAt || new Date().toISOString()
+        };
       });
-
-
-      const formattedGames = gamesData.map(g => ({
-        ...g,
-        id: g.id || g._id,
-        rounds: Array.isArray(g.Rounds) ? g.Rounds :
-          Array.isArray(g.rounds) ? g.rounds : [],
-        player1Score: g.player1Score || 0,
-        player2Score: g.player2Score || 0,
-        tieRounds: g.tieRounds || 0,
-        createdAt: g.createdAt || g.created_at || new Date().toISOString()
-      }));
 
       console.log('Formatted Games:', formattedGames);
       setGames(formattedGames);
